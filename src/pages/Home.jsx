@@ -40,7 +40,7 @@ function Home() {
   return (
     <div className="homePageWrapper">
             <div className="formWrapper">
-                <h2 className='text-2xl py-4 text-green-600 font-semibold'>Welcome To CodeTogether</h2>
+                <h2 className='title'>Welcome To CodeTogether</h2>
                 <h4 className="mainLabel">Paste invitation ROOM ID</h4>
                 <div className="inputGroup">
                     <input
