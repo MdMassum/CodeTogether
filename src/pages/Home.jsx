@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import {toast} from 'react-hot-toast'
+import { v4 as uuidV4 } from 'uuid'; // for generating id
 
 function Home() {
 
@@ -24,7 +26,7 @@ function Home() {
       // Redirect
       navigate(`/editor/${roomId}`, {
           state: {
-              username,
+              username,   // passing username to editor page 
           },
       });
   };
@@ -73,7 +75,7 @@ function Home() {
                 </div>
             </div>
             <footer>
-                <h4>
+                <h4 className='mb-2'>
                     Built with 💛 &nbsp; by &nbsp;
                     <a href="https://github.com/CodeTogether">M.Emamudin</a>
                 </h4>
