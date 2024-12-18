@@ -1,14 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Client from "../components/client";
 import Editor from "../components/Editor";
 import {toast} from 'react-hot-toast'
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { initSocket } from "../socket";
+import ACTIONS from "../Action";
+
+// useRef hook --> The useRef Hook allows us to persist values between renders.
+// It can be used to store a mutable value that does not cause a re-render when updated.
 
 function EditorPage() {
 
     const location = useLocation();
     const { roomId } = useParams();
     const navigate = useNavigate();
+
+    const socketRef = useRef(null);
+
+    useEffect(()=>{
+      const init = async () =>{
+        socketRef.current = await initSocket();  // for establishing connection
+
+        socketRef.current.on('connect_error',(err)=> handleError(err));   // handling socket errors
+        socketRef.current.on('connect_failed',(err)=> handleError(err));
+
+        function handleError(err){  
+          console.log("Socket_Err", err);
+          toast.error("Socket Connection Failed, Try Again later");
+          navigate('/');
+        }
+
+        socketRef.current.emit(ACTIONS.JOIN,{    // sending message on joining
+          roomId,
+          username: location.state?.username,
+        })
+      }
+      init();
+    },[])
 
     const [clients, setClient] = useState([
         {socketId:1,username:"masum"},
