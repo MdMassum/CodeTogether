@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import Client from "../components/client";
 import Editor from "../components/Editor";
-import {toast} from 'react-hot-toast'
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { initSocket } from "../socket";
 import ACTIONS from "../Action";
 
@@ -10,57 +15,95 @@ import ACTIONS from "../Action";
 // It can be used to store a mutable value that does not cause a re-render when updated.
 
 function EditorPage() {
+  const location = useLocation();
+  const { roomId } = useParams();
+  const navigate = useNavigate();
 
-    const location = useLocation();
-    const { roomId } = useParams();
-    const navigate = useNavigate();
+  const socketRef = useRef(null);
+  const [clients, setClients] = useState([]);
 
-    const socketRef = useRef(null);
-
-    useEffect(()=>{
-      const init = async () =>{
-        socketRef.current = await initSocket();  // for establishing connection
-
-        socketRef.current.on('connect_error',(err)=> handleError(err));   // handling socket errors
-        socketRef.current.on('connect_failed',(err)=> handleError(err));
-
-        function handleError(err){  
-          console.log("Socket_Err", err);
-          toast.error("Socket Connection Failed, Try Again later");
-          navigate('/');
-        }
-
-        socketRef.current.emit(ACTIONS.JOIN,{    // sending message on joining
-          roomId,
-          username: location.state?.username,
-        })
-      }
-      init();
-    },[])
-
-    const [clients, setClient] = useState([
-        {socketId:1,username:"masum"},
-        {socketId:2,username:"john"},
-    ]);
-
-    async function copyRoomId() {
+  useEffect(() => {
+    const initSocketConnection = async () => {
         try {
-            await navigator.clipboard.writeText(roomId);
-            toast.success('Room ID has been copied to your clipboard');
+            socketRef.current = await initSocket(); // Establish socket connection
+
+            // Error handling for socket connection
+            socketRef.current.on("connect_error", (err) => handleError(err));
+            socketRef.current.on("connect_failed", (err) => handleError(err));
+
+            socketRef.current.emit(ACTIONS.JOIN, {  // sending message on joining
+                roomId,
+                username: location.state?.username,
+            });
+
+            // listining for joined event  i.e if anyone joins room
+            socketRef.current.on(ACTIONS.JOINED, handleJoin);
+
+            // listining for Disconnected i.e if anyone leaves the room
+            socketRef.current.on(ACTIONS.DISCONNECTED, handleDisconnect);
         } catch (err) {
-            toast.error('Could not copy the Room ID');
-            console.error(err);
+            handleError(err);
         }
+    };
+
+    const handleError = (err) => {
+        console.log("Socket_Err", err);
+        toast.error("Socket Connection Failed, Try Again later");
+        navigate("/"); // Redirect to home if error occurs
+    };
+
+    const handleJoin = ({ clients, username, socketId }) => {
+        if (username !== location.state?.username) {
+            toast.success(`${username} joined`);
+            console.log(`${username} joined`);
+        }
+        setClients(clients); // Update the client list
+    };
+
+    const handleDisconnect = ({ socketId, username }) => {
+        toast.success(`${username} left the room`);
+        // update client state after leaving
+        setClients((prev) => prev.filter((client) => client.socketId !== socketId));
+    };
+
+    // Initialize socket connection when the component mounts
+    initSocketConnection();
+
+    // Cleanup when the component unmounts
+     // If we don't remove these listeners, they could continue to listen to events even after the component is unmounted, leading to memory leaks.
+    return () => {
+        if (socketRef.current) {
+            socketRef.current.disconnect();
+            socketRef.current.off(ACTIONS.JOINED);
+            socketRef.current.off(ACTIONS.DISCONNECTED);
+        }
+    };
+
+}, []);
+
+
+  async function copyRoomId() {
+    try {
+      await navigator.clipboard.writeText(roomId);
+      toast.success("Room ID has been copied to your clipboard");
+    } catch (err) {
+      toast.error("Could not copy the Room ID");
+      console.error(err);
     }
-    const leaveRoom = () =>{
-        navigate('/');
-    }
+  }
+  const leaveRoom = () => {
+    navigate("/");
+  };
+
+  if (!location.state) {
+    return <Navigate to="/" />;
+  }
   return (
     <div className="mainWrap">
       <div className="aside">
         <div className="asideInner">
           <div className="logo">
-          <h2 className='title'>CodeTogether</h2>
+            <h2 className="title">CodeTogether</h2>
           </div>
           <h3>Connected</h3>
           <div className="clientsList">
