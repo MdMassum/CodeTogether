@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Client from "../components/client";
+import Client from "../components/Client";
 import Editor from "../components/Editor";
 import { toast } from "react-hot-toast";
 import {
