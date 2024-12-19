@@ -20,11 +20,20 @@ function EditorPage() {
   const navigate = useNavigate();
 
   const socketRef = useRef(null);
+  const codeRef = useRef(null);
   const [clients, setClients] = useState([]);
 
   useEffect(() => {
+
     const initSocketConnection = async () => {
+
         try {
+
+            if (socketRef.current) {
+              console.log("Socket connection already initialized, skipping...");
+              return;
+            }
+            console.log("started")
             socketRef.current = await initSocket(); // Establish socket connection
 
             // Error handling for socket connection
@@ -58,6 +67,12 @@ function EditorPage() {
             console.log(`${username} joined`);
         }
         setClients(clients); // Update the client list
+
+        // when new user joins then emit current code
+        socketRef.current.emit(ACTIONS.SYNC_CODE,{
+          code : codeRef.current,
+          socketId
+        })  
     };
 
     const handleDisconnect = ({ socketId, username }) => {
@@ -72,15 +87,19 @@ function EditorPage() {
     // Cleanup when the component unmounts
      // If we don't remove these listeners, they could continue to listen to events even after the component is unmounted, leading to memory leaks.
     return () => {
-        if (socketRef.current) {
-            socketRef.current.disconnect();
-            socketRef.current.off(ACTIONS.JOINED);
-            socketRef.current.off(ACTIONS.DISCONNECTED);
+      console.log("useEffect cleanup in");
+      if (socketRef?.current) {
+          console.log("useEffect cleanup");
+          socketRef.current.off(ACTIONS.JOINED);
+          socketRef.current.off(ACTIONS.DISCONNECTED);
+          socketRef.current.disconnect();
+          socketRef.current = null
+          console.log("useEffect cleanup finished");
+
         }
     };
 
 }, []);
-
 
   async function copyRoomId() {
     try {
@@ -121,11 +140,11 @@ function EditorPage() {
       </div>
       <div className="editorWrap">
         <Editor
-        //   socketRef={socketRef}
-        //   roomId={roomId}
-        //   onCodeChange={(code) => {
-        //     codeRef.current = code;
-        //   }}
+          socketRef={socketRef}
+          roomId={roomId}
+          onCodeChange={(code) => {
+            codeRef.current = code;
+          }}
         />
       </div>
     </div>
