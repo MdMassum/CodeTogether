@@ -2,7 +2,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
 import { configDotenv } from 'dotenv'
-import ACTIONS from './src/Action.js'
+import ACTIONS from '../src/Action.js'
 import path from 'path'
 import { fileURLToPath } from 'url';
 
@@ -11,6 +11,9 @@ const app = express()
 const server = http.createServer(app)
 const io = new Server(server);
 
+app.get("/", (req, res) => {
+    res.send("Hello from Express on Vercel!");
+});
 // for deployment  
 // since file are ES module so we need to get __filename and __dirname manually else in commonjs not required
 const __filename = fileURLToPath(import.meta.url);

@@ -4,12 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start:docker": "pm2 start server.js && npm start",
-    "start": "npm run build && npm run server:prod",
     "dev": "vite",
-    "server:dev": "nodemon server.js",
-    "server:prod": "node server.js",
     "build": "vite build",
+    "start": "node api/index.js",
+    "start:docker": "pm2 start index.js && npm start",
+    "start:dev": "npm run build && npm run server:prod",
+
+    "server:dev": "nodemon api/index.js",
+    "server:prod": "node api/index.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },

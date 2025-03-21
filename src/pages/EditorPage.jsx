@@ -40,22 +40,30 @@ function EditorPage() {
               return;
             }
             console.log("started")
-            socketRef.current = await initSocket(); // Establish socket connection
+            socketRef.current = initSocket(); // Establish socket connection
 
             // Error handling for socket connection
             socketRef.current.on("connect_error", (err) => handleError(err));
             socketRef.current.on("connect_failed", (err) => handleError(err));
 
-            socketRef.current.emit(ACTIONS.JOIN, {  // sending message on joining
-                roomId,
-                username: location.state?.username,
-            });
+            if (socketRef.current) {
+                socketRef.current.emit(ACTIONS.JOIN, {  // sending message on joining
+                    roomId,
+                    username: location.state?.username,
+                });
+            }
 
-            // listining for joined event  i.e if anyone joins room
-            socketRef.current.on(ACTIONS.JOINED, handleJoin);
+            if (socketRef.current) {
+                // listining for joined event  i.e if anyone joins room
+                socketRef.current.on(ACTIONS.JOINED, handleJoin);
+            }
 
-            // listining for Disconnected i.e if anyone leaves the room
-            socketRef.current.on(ACTIONS.DISCONNECTED, handleDisconnect);
+            if (socketRef.current) {
+                // listining for Disconnected i.e if anyone leaves the room
+                socketRef.current.on(ACTIONS.DISCONNECTED, handleDisconnect);
+            }
+            
+            
         } catch (err) {
             handleError(err);
         }
@@ -95,10 +103,16 @@ function EditorPage() {
     return () => {
     
         console.log("useEffect cleanup");
-        socketRef.current.off(ACTIONS.JOINED);
-        socketRef.current.off(ACTIONS.DISCONNECTED);
-        socketRef.current.disconnect();
-        // socketRef.current = null
+        if (socketRef.current) {
+            socketRef.current.off(ACTIONS.JOINED);
+            socketRef.current.off(ACTIONS.DISCONNECTED);
+            socketRef.current.disconnect();
+            // socketRef.current = null
+        }
+        else{
+            console.log("already null")
+        }
+        
         console.log("useEffect cleanup finished");
         
     };
