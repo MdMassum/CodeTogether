@@ -5,25 +5,34 @@ import { configDotenv } from 'dotenv'
 import ACTIONS from '../src/Action.js'
 import path from 'path'
 import { fileURLToPath } from 'url';
+import cors from 'cors'
 
 configDotenv()
 const app = express()
 const server = http.createServer(app)
-const io = new Server(server);
+const io = new Server(server,{
+    cors: {
+        origin: process.env.frontend_url,
+        methods: ['GET', 'POST'],
+      },
+});
+app.use(cors());
+
+console.log(process.env.frontend_url)
 
 app.get("/", (req, res) => {
-    res.send("Hello from Express on Vercel!");
+    res.send("Hello from Server!");
 });
 // for deployment  
 // since file are ES module so we need to get __filename and __dirname manually else in commonjs not required
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-app.use(express.static('dist'));
-app.use((req, res, next) => {
-    console.log(path.join(__dirname,'dist', 'index.html'));
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
+// app.use(express.static('dist'));
+// app.use((req, res, next) => {
+//     console.log(path.join(__dirname,'dist', 'index.html'));
+//     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// });
 
 const userSocketMap = {};
 
