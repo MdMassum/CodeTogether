@@ -50,7 +50,7 @@ To run the app using docker, follow the steps below:
 3. Also you have to change ENV values in the Dockerfile
 4. Replace your username in docker-compose.yml file.
 5. Run the Docker Compose command: `docker-compose up -d`
-6. Go to `http://localhost:3000` to view the app
+6. Go to `http://localhost:5173` to view the app
 7. Follow the steps 5-7 from the [Running via Docker Image]() section to create and join a room
 
 ### DEMO
@@ -62,10 +62,11 @@ To run the app using docker, follow the steps below:
 2. Run `npm install` to install the dependencies
 3. Create .env file in the root folder and copy paste the content of example.env, and add necessary credentials.
 4. To start the react app client run `npm start` in one terminal
-5. To start the server run `npm server:dev` or `pm2 start server.js` in another terminal
-6. Go to `http://localhost:3000` to view the app
-7. Follow the steps 4-7 from the [Running via Docker Image]() section to create and join a room
+5. To start the server run `npm dev:server` or `pm2 start server.js` in another terminal
+6. To start the react app and server both in one command run  `npm run dev` in the terminal.
+7. Go to `http://localhost:5173` to view the app
+8. Follow the steps 4-7 from the [Running via Docker Image]() section to create and join a room
 
-**Note:** To stop your server, press `Ctrl+c` or if you used "pm2", then use `pm2 stop server.js` in the terminal.
+**Note:** To stop your server, press `Ctrl+c` in the terminal.
 
 

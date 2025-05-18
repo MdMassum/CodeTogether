@@ -5,8 +5,6 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    image: "<your_docker_username>/code-editor"
+    image: "codetogether_img"
     ports:
-      - "5000:5000"
-      - "3000:3000"
-      - "8000:8000"
+      - 5000:5000

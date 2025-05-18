@@ -77,7 +77,7 @@ function Home() {
             <footer>
                 <h4 className='mb-2'>
                     Built with 💛 &nbsp; by &nbsp;
-                    <a href="https://github.com/CodeTogether">M.Emamudin</a>
+                    <a href="https://github.com/MdMassum/CodeTogether">M.Emamudin</a>
                 </h4>
             </footer>
         </div>
